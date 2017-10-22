@@ -7,3 +7,18 @@ td {
     height: 50px;
     text-align: center;
 }
+[couleur = bleu] {
+    background-color: blue;
+}
+[couleur = rouge] {
+    background-color: red;
+}
+[couleur = bleur] {
+    background: radial-gradient(circle, blue, black, blue);
+}
+[couleur = rouger] {
+    background: radial-gradient(circle, red, black, red);
+}
+[couleur = fight] {
+    background: linear-gradient(to bottom right, blue , red);
+}

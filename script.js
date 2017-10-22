@@ -1,5 +1,5 @@
-var ligne = 10;
-var col = 10;
+var ligne = 15;
+var col = 40;
 var tableau = [];
 //generation du tableau HTML et JS
 var cible = $("#cible");
@@ -26,17 +26,17 @@ $("td").click(function(){
 var bleu = 1;
 var rouge = 2;
 //emplacement accouplement bleu : 3
-var accouplement_bleu =  "XB";
+var accouplement_bleu =  "bleur";
 //emplacement accouplement rouge : 4
-var accouplement_rouge =  "XR";     
+var accouplement_rouge =  "rouger";     
 //emplacement combat : 5
-var combat = "C";
+var combat = "fight";
 
 function insert_couleur(couleur){
     if (couleur == 1) {
-        return "B";
+        return "bleu";
     }else if (couleur == 2) {
-        return "R";
+        return "rouge";
     }
 }
 
@@ -52,7 +52,7 @@ function depart (nb, type, tab = tableau){
         var alea_ligne = alea(ligne);
         var alea_col = alea(col);        
         if (tab[alea_ligne][alea_col] === 0) {
-            $("#"+alea_ligne+" > ."+alea_col).html(insert_couleur(type));
+            $("#"+alea_ligne+" > ."+alea_col).attr("couleur", insert_couleur(type));
             tab[alea_ligne][alea_col] = type;
             //console.log("ligne :"+ alea_ligne + " col : " +alea_col);
             compteur++;
@@ -62,9 +62,9 @@ function depart (nb, type, tab = tableau){
 }
 //----------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
-//----------------------------------------------------------------------------------------------------------------------
-depart(5, bleu)
-depart(5, rouge)
+//Nombre de pions -------------------------------------------------------------------------------------------------
+depart(10, bleu)
+depart(10, rouge)
 //----------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
@@ -194,22 +194,22 @@ function affiche_deplacement(tab_nouveau = tableau){
     for (var i = 0; i < tab_nouveau.length; i++) {
         for (var j = 0; j < tab_nouveau[i].length; j++) {
             if(tab_nouveau[i][j] == 0) {
-                $("#"+i+" > ."+j).html("");
+                $("#"+i+" > ."+j).removeAttr("couleur");
             }
             if(tab_nouveau[i][j] == 1) {
-                $("#"+i+" > ."+j).html(insert_couleur(1));
+                $("#"+i+" > ."+j).attr("couleur", insert_couleur(1));
             }
             if(tab_nouveau[i][j] == 2) {
-                $("#"+i+" > ."+j).html(insert_couleur(2));
+                $("#"+i+" > ."+j).attr("couleur", insert_couleur(2));
             }
             if(tab_nouveau[i][j] == 3) {
-                $("#"+i+" > ."+j).html(accouplement_bleu);
+                $("#"+i+" > ."+j).attr("couleur", accouplement_bleu);
             }
             if(tab_nouveau[i][j] == 4) {
-                $("#"+i+" > ."+j).html(accouplement_rouge);
+                $("#"+i+" > ."+j).attr("couleur", accouplement_rouge);
             }
             if(tab_nouveau[i][j] == 5) {
-                $("#"+i+" > ."+j).html(combat);
+                $("#"+i+" > ."+j).attr("couleur", combat);
             }
         }
     }
