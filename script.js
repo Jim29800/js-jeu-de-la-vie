@@ -1,4 +1,4 @@
-var ligne = 15;
+var ligne = 12;
 var col = 40;
 var tableau = [];
 //generation du tableau HTML et JS
@@ -124,7 +124,6 @@ function deplacement(tab){
         } return newArray;
     }
     var tab_nouveau = tab.clone();    
-    
     for (var i = 0; i < tab.length; i++) {
         for (var j = 0; j < tab[i].length; j++) {
             if (tab[i][j] == 1 || tab[i][j] == 2) {
@@ -191,34 +190,55 @@ function deplacement(tab){
     return tab_nouveau;
 }
 function affiche_deplacement(tab_nouveau = tableau){
+    var compteur1 = 0;
+    var compteur2 = 0;
+    var toutecase = 0;
     for (var i = 0; i < tab_nouveau.length; i++) {
         for (var j = 0; j < tab_nouveau[i].length; j++) {
             if(tab_nouveau[i][j] == 0) {
+                toutecase = 1;
                 $("#"+i+" > ."+j).removeAttr("couleur");
             }
             if(tab_nouveau[i][j] == 1) {
+                compteur1++;
                 $("#"+i+" > ."+j).attr("couleur", insert_couleur(1));
             }
             if(tab_nouveau[i][j] == 2) {
+                compteur2++
                 $("#"+i+" > ."+j).attr("couleur", insert_couleur(2));
             }
             if(tab_nouveau[i][j] == 3) {
+                compteur1++;                
                 $("#"+i+" > ."+j).attr("couleur", accouplement_bleu);
             }
             if(tab_nouveau[i][j] == 4) {
+                compteur2++                
                 $("#"+i+" > ."+j).attr("couleur", accouplement_rouge);
             }
             if(tab_nouveau[i][j] == 5) {
+                compteur1++;                
+                compteur2++;                                
                 $("#"+i+" > ."+j).attr("couleur", combat);
             }
         }
+    }
+    if(compteur1 == 0) {
+        clearInterval(auto);
+        alert("Rouge domine");
+    }else if(compteur2 == 0) {
+        clearInterval(auto);
+        alert("Bleu domine");
+    }
+    else if(toutecase == 0) {
+        clearInterval(auto);
+        alert("Plus de mouvement possible");
     }
 }
 
     
 //console.log(tableau)
 //debut de l'automatisation
-setInterval(function () {
+var auto = setInterval(function () {
     tableau = deplacement(tableau)
     affiche_deplacement()
-}, 1000);
+}, 300);
