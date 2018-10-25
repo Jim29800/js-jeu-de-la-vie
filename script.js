@@ -1,26 +1,27 @@
 //------------------------------------Définition des variables----------------------------------------
 
 //table
-let ligne = 5;
-let col = 10;
+let ligne = 10;
+let col = 30;
 let cible = $("#cible");    //cible la table du HTML pour créer row et col
 let html;                   //contient le code html pour créer la table
 let damier = [];
 
 //fourmis
 let listeCouleurs = ["bleu", "rouge"]   //à ajouter égallement au CSS
-let nombreFourmisTotal = 2;            //doit être divisible par le nombre de couleur 
+let nombreFourmisTotal = 12;            //doit être divisible par le nombre de couleur 
 let nombreFourmisParCouleur = nombreFourmisTotal / listeCouleurs.length;
 let fourmisVivantes = [];
 let fourmisMortes = [];
 
 //durée de vie d'une fourmi : [ mini , maxi ]
-let dureeDeVie = [30,35]
+let dureeDeVie = [60,70]
 
 //accouplement
-let ageMin = 5;
-let ageMax = 25;
-let delais = 2;
+let ageMin = 18;
+let ageMax = 55;
+let delais = 5;
+
 //----------------------generation de la table HTML et du damier (array) JS----------------------------------------
 
 //Génération du code HTML
@@ -50,6 +51,7 @@ class Fourmi {
     constructor(couleur, sexe = this.setSexe(), dureeDeVieMin = dureeDeVie[0], dureeDeVieMax = dureeDeVie[1]) {
         this.couleur = couleur;
         this.sexe = sexe;
+        this.delais = 0;
         this.age = 0;
         this.ageMax = this.setAgeMax(dureeDeVieMin, dureeDeVieMax);
         this.morte = false;
@@ -125,6 +127,9 @@ function estVivante(fourmi) {
         return false;
     }else{
         fourmi.age ++;
+        if (fourmi.delais > 0) {
+            fourmi.delais --;
+        }
         return true;
     }
 }
@@ -191,7 +196,40 @@ function calculDeplacement(fourmi, terrain = damier){
     return [xNouveau, yNouveau];
 }
 
+function nouvelleFourmi(fourmi1, fourmi2, terrain = damier, nbLigne = ligne, nbCol = col, listeFourmisVivantes = fourmisVivantes, min = ageMin, max = ageMax, nouveauDelais = delais) {
+    
+    if (fourmi1.sexe === fourmi2.sexe) {
+        return false;
+    } else if (fourmi1.age < min || fourmi1.age > max || fourmi1.delais > 0 || fourmi2.age < min || fourmi2.age > max || fourmi2.delais > 0) {
+        return false;
+    } else {
+        listeFourmisVivantes.push(new Fourmi(fourmi1.couleur));
+        fourmiCréer = false
+        while (!fourmiCréer) {
+            let ligne = Math.floor(Math.random() * nbLigne);
+            let col = Math.floor(Math.random() * nbCol);
+            if (terrain[ligne][col] === 0) {
+                //place la fourmis sur le terrain
+                $("#" + ligne + " > ." + col).attr("couleur", listeFourmisVivantes[listeFourmisVivantes.length - 1].couleur);
+                terrain[ligne][col] = listeFourmisVivantes[listeFourmisVivantes.length - 1];
+                //ajoute les coordonnées à la fourmi
+                listeFourmisVivantes[listeFourmisVivantes.length - 1].x = ligne;
+                listeFourmisVivantes[listeFourmisVivantes.length - 1].y = col;
+                //incrémante le compteur
+                fourmiCréer = true;
+            }
+        }
+        fourmi1.delais = nouveauDelais;
+        fourmi2.delais = nouveauDelais;
+        return true;
+    }
+}
+
 function deplacement(vivantes = fourmisVivantes, mortes = fourmisMortes , terrain = damier){
+
+    //calcule le nombre de place du terrain
+    let nombrePlace = (terrain.length * terrain[0].length);
+
     for (let i = 0; i < vivantes.length; i++) {
 
         //vérifie son age
@@ -202,9 +240,12 @@ function deplacement(vivantes = fourmisVivantes, mortes = fourmisMortes , terrai
             let x = nouvelleCoordonees[0];
             let y = nouvelleCoordonees[1];
 
-            //verifie que la fourmi a changer de place
+            //verifie que la fourmi n'a pas changer de place
             if (x === vivantes[i].x && y === vivantes[i].y) {
-                //ne fait rien
+                //modifi l'affichage sur la page html
+                $("#" + x + " > ." + y).removeAttr("couleur");
+                $("#" + x + " > ." + y).attr("couleur", vivantes[i].couleur);
+
             }
             //verifie que l'emplacement est vide
             else if (terrain[x][y] === 0) {
@@ -226,23 +267,35 @@ function deplacement(vivantes = fourmisVivantes, mortes = fourmisMortes , terrai
                 $("#" + x + " > ." + y).attr("couleur", vivantes[i].couleur);
 
             }
+            //les fourmis sont de la même couleur
+            else if (terrain[x][y].couleur === vivantes[i].couleur) {
+                if (nombrePlace > vivantes.length) {
+
+                    if(nouvelleFourmi(vivantes[i], terrain[x][y])){
+                        //modifi l'affichage sur la page html
+                        $("#" + vivantes[i].x + " > ." + vivantes[i].y).removeAttr("couleur");
+                        $("#" + x + " > ." + y).attr("couleur", vivantes[i].couleur + "A");
+                    }else {
+                        //modifi l'affichage sur la page html
+                        $("#" + x + " > ." + y).removeAttr("couleur");
+                        $("#" + x + " > ." + y).attr("couleur", vivantes[i].couleur);
+                    }
+                }
+            }
         }else{
             $("#" + vivantes[i].x + " > ." + vivantes[i].y).removeAttr("couleur");
             mortes.push(vivantes[i]);
             terrain[vivantes[i].x][vivantes[i].y] = 0;
-            vivantes.slice(i, 1);
+            vivantes.splice(i, 1);
         }
     }
-
     //stop le set interval si il n'y a plus de fourmis
-    if (vivantes.length === 0) {
+    if (vivantes.length === 0 || vivantes.length === nombrePlace ) {
         clearInterval(auto);
     }
 }
 
-
-
 var auto = setInterval(function () {
     deplacement();
-    console.log(damier)
+    //console.log(damier)
 }, 1000);

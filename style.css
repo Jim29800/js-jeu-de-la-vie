@@ -13,10 +13,10 @@ td {
 [couleur = rouge] {
     background-color: red;
 }
-[couleur = bleur] {
+[couleur = bleuA] {
     background: radial-gradient(circle, blue, black, blue);
 }
-[couleur = rouger] {
+[couleur = rougeA] {
     background: radial-gradient(circle, red, black, red);
 }
 [couleur = fight] {
